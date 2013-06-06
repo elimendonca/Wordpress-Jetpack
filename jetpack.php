@@ -1626,7 +1626,7 @@ p {
 	}
 
 	function admin_menu_order() {
-		return true;
+		return false;
 	}
 
 	function jetpack_menu_order( $menu_order ) {
