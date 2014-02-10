@@ -28,15 +28,21 @@ class Jetpack {
 	var $HTTP_RAW_POST_DATA = null; // copy of $GLOBALS['HTTP_RAW_POST_DATA']
 
 	var $plugins_to_deactivate = array(
-		'stats'              => array( 'stats/stats.php', 'WordPress.com Stats' ),
-		'shortlinks'         => array( 'stats/stats.php', 'WordPress.com Stats' ),
-		'sharedaddy'         => array( 'sharedaddy/sharedaddy.php', 'Sharedaddy' ),
-		'twitter-widget'     => array( 'wickett-twitter-widget/wickett-twitter-widget.php', 'Wickett Twitter Widget' ),
-		'after-the-deadline' => array( 'after-the-deadline/after-the-deadline.php', 'After The Deadline' ),
-		'contact-form'       => array( 'grunion-contact-form/grunion-contact-form.php', 'Grunion Contact Form' ),
-		'custom-css'         => array( 'safecss/safecss.php', 'WordPress.com Custom CSS' ),
-		'random-redirect'    => array( 'random-redirect/random-redirect.php', 'Random Redirect' ),
-		'videopress'         => array( 'video/video.php', 'VideoPress' ),
+		'stats'              	 => array( 'stats/stats.php', 'WordPress.com Stats' ),
+		'shortlinks'         	 => array( 'stats/stats.php', 'WordPress.com Stats' ),
+		'sharedaddy'         	 => array( 'sharedaddy/sharedaddy.php', 'Sharedaddy' ),
+		'twitter-widget'     	 => array( 'wickett-twitter-widget/wickett-twitter-widget.php', 'Wickett Twitter Widget' ),
+		'after-the-deadline'	 => array( 'after-the-deadline/after-the-deadline.php', 'After The Deadline' ),
+		'contact-form'		 => array( 'grunion-contact-form/grunion-contact-form.php', 'Grunion Contact Form' ),
+		'custom-css'		 => array( 'safecss/safecss.php', 'WordPress.com Custom CSS' ),
+		'random-redirect'	 => array( 'random-redirect/random-redirect.php', 'Random Redirect' ),
+		'videopress'		 => array( 'video/video.php', 'VideoPress' ),
+		'widget-visibility'	 => array( 'jetpack-widget-visibility/widget-visibility.php', 'Jetpack Widget Visibility' ),
+		'widget-visibility'	 => array( 'widget-visibility-without-jetpack/widget-visibility-without-jetpack.php', 'Widget Visibility Without Jetpack' ),
+		'sharedaddy'		 => array( 'jetpack-sharing/sharedaddy.php', 'Jetpack Sharing' ),
+		'omnisearch'		 => array( 'jetpack-omnisearch/omnisearch.php', 'Jetpack Omnisearch' ),
+		'gravatar-hovercards'	 => array( 'jetpack-gravatar-hovercards/gravatar-hovercards.php', 'Jetpack Gravatar Hovercards' ),
+		'latex'			 => array( 'wp-latex/wp-latex.php', 'WP LaTeX' ),
 	);
 
 	var $capability_translations = array(
@@ -63,30 +69,39 @@ class Jetpack {
 	 */
 	private $conflicting_plugins = array(
 		'comments'          => array(
-			'Intense Debate'      => 'intensedebate/intensedebate.php',
-			'Disqus'              => 'disqus-comment-system/disqus.php',
+			'Intense Debate'	  => 'intensedebate/intensedebate.php',
+			'Disqus'		  => 'disqus-comment-system/disqus.php',
 		),
 		'contact-form'      => array(
-			'Contact Form 7'      => 'contact-form-7/wp-contact-form-7.php',
-			'Gravity Forms'       => 'gravityforms/gravityforms.php',
-			'Contact Form Plugin' => 'contact-form-plugin/contact_form.php',
-			'Easy Contact Forms'  => 'easy-contact-forms/easy-contact-forms.php',
+			'Contact Form 7'	   => 'contact-form-7/wp-contact-form-7.php',
+			'Gravity Forms'		   => 'gravityforms/gravityforms.php',
+			'Contact Form Plugin'	   => 'contact-form-plugin/contact_form.php',
+			'Easy Contact Forms'	   => 'easy-contact-forms/easy-contact-forms.php',
+			'Fast Secure Contact Form' => 'si-contact-form/si-contact-form.php',
 		),
 		'gplus-authorship'  => array(
-			'WP SEO by Yoast'     => 'wordpress-seo/wp-seo.php',
+			'WP SEO by Yoast'	  => 'wordpress-seo/wp-seo.php',
 		),
 		'minileven'         => array(
-			'WPtouch'             => 'wptouch/wptouch.php',
+			'WPtouch'		  => 'wptouch/wptouch.php',
+		),
+		'latex'		    => array(
+			'LaTeX for WordPress'	  => 'latex/latex.php',
+			'Youngwhans Simple Latex' => 'youngwhans-simple-latex/yw-latex.php',
+			'Easy WP LaTeX'		  => 'easy-wp-latex-lite/easy-wp-latex-lite.php',
+			'MathJax-LaTeX'		  => 'mathjax-latex/mathjax-latex.php',
+			'Enable Latex'		  => 'enable-latex/enable-latex.php',
+			'WP QuickLaTeX'		  => 'wp-quicklatex/wp-quicklatex.php',
 		),
 		'sharedaddy'        => array(
-			'AddThis'             => 'addthis/addthis_social_widget.php',
-			'Add To Any'          => 'add-to-any/add-to-any.php',
-			'ShareThis'           => 'share-this/sharethis.php',
-			'Shareaholic'         => 'shareaholic/shareaholic.php',
+			'AddThis'		  => 'addthis/addthis_social_widget.php',
+			'Add To Any'		  => 'add-to-any/add-to-any.php',
+			'ShareThis'		  => 'share-this/sharethis.php',
+			'Shareaholic'		  => 'shareaholic/shareaholic.php',
 		),
 		'widget-visibility' => array(
-			'Widget Logic'        => 'widget-logic/widget_logic.php',
-			'Dynamic Widgets'     => 'dynamic-widgets/dynamic-widgets.php',
+			'Widget Logic'		  => 'widget-logic/widget_logic.php',
+			'Dynamic Widgets'	  => 'dynamic-widgets/dynamic-widgets.php',
 		),
 		'random-redirect' => array(
 			'Random Redirect 2'	  => 'random-redirect-2/random-redirect.php',
@@ -267,6 +282,9 @@ class Jetpack {
 		add_action( 'wp_ajax_jetpack-check-news-subscription', array( $this, 'check_news_subscription' ) );
 		add_action( 'wp_ajax_jetpack-subscribe-to-news', array( $this, 'subscribe_to_news' ) );
 
+		add_action( 'wp_ajax_jetpack-sync-reindex-trigger', array( $this, 'sync_reindex_trigger' ) );
+		add_action( 'wp_ajax_jetpack-sync-reindex-status', array( $this, 'sync_reindex_status' ) );
+
 		add_action( 'wp_loaded', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'devicepx' ) );
 		add_action( 'customize_controls_enqueue_scripts', array( $this, 'devicepx' ) );
@@ -278,11 +296,13 @@ class Jetpack {
 
 		add_action( 'jetpack_activate_module', array( $this, 'activate_module_actions' ) );
 
+		add_action( 'plugins_loaded', array( $this, 'extra_oembed_providers' ) );
+
 		/**
 		 * These actions run checks to load additional files.
 		 * They check for external files or plugins, so they need to run as late as possible.
 		 */
-		add_action( 'plugins_loaded', array( $this, 'check_open_graph' ),       999 );
+		add_action( 'wp_head', array( $this, 'check_open_graph' ),       1 );
 		add_action( 'plugins_loaded', array( $this, 'check_twitter_tags' ),     999 );
 		add_action( 'plugins_loaded', array( $this, 'check_rest_api_compat' ), 1000 );
 
@@ -315,6 +335,13 @@ class Jetpack {
 		// Don't let anyone authenticate
 		$_COOKIE = array();
 		remove_all_filters( 'authenticate' );
+
+		/**
+		 * For the moment, remove Limit Login Attempts if its xmlrpc for Jetpack.
+		 * If Limit Login Attempts is installed as a mu-plugin, it can occasionally
+		 * generate false-positives.
+		 */
+		remove_filter( 'wp_login_failed', 'limit_login_failed' );
 
 		if ( Jetpack::is_active() ) {
 			// Allow Jetpack authentication
@@ -373,7 +400,7 @@ class Jetpack {
 	 * @filter require_lib_dir
 	 */
 	function require_lib_dir( $lib_dir ) {
-		return JETPACK__PLUGIN_DIR . 'lib';
+		return JETPACK__PLUGIN_DIR . '_inc/lib';
 	}
 
 	/**
@@ -410,6 +437,21 @@ class Jetpack {
 		}
 		return (bool) Jetpack_Data::get_access_token( $user_id );
 	}
+	
+	/**
+	 * Get the wpcom email of the current connected user.
+	 */
+	public static function get_connected_user_email() {
+		Jetpack::load_xml_rpc_client();
+		$xml = new Jetpack_IXR_Client( array(
+			'user_id' => get_current_user_id()
+		) );
+		$xml->query( 'wpcom.getUserEmail' );
+		if ( ! $xml->isError() ) {
+			return $xml->getResponse();
+		}
+		return false;
+	}
 
 	function current_user_is_connection_owner() {
 		$user_token = Jetpack_Data::get_access_token( JETPACK_MASTER_USER );
@@ -417,8 +459,16 @@ class Jetpack {
 	}
 
 	/**
-	* Synchronize connected user role changes
-	*/
+	 * Add any extra oEmbed providers that we know about and use on wpcom for feature parity.
+	 */
+	function extra_oembed_providers() {
+		// Cloudup: https://dev.cloudup.com/#oembed
+		wp_oembed_add_provider( 'https://cloudup.com/*' , 'https://cloudup.com/oembed' );
+	}
+
+	/**
+	 * Synchronize connected user role changes
+	 */
 	function user_role_change( $user_id ) {
 		if ( Jetpack::is_active() && Jetpack::is_user_connected( $user_id ) ) {
 			$current_user_id = get_current_user_id();
@@ -526,7 +576,8 @@ class Jetpack {
 		do_action( 'jetpack_modules_loaded' );
 
 		// Load module-specific code that is needed even when a module isn't active. Loaded here because code contained therein may need actions such as setup_theme.
-		require_once( JETPACK__PLUGIN_DIR . 'modules/module-extras.php' );
+		if ( Jetpack::is_active() || Jetpack::is_development_mode() )
+			require_once( JETPACK__PLUGIN_DIR . 'modules/module-extras.php' );
 	}
 
 	/**
@@ -590,6 +641,17 @@ class Jetpack {
 			'wp-facebook-like-send-open-graph-meta/wp-facebook-like-send-open-graph-meta.php',	// WP Facebook Like Send & Open Graph Meta
 			'network-publisher/networkpub.php',							// Network Publisher
 			'wp-ogp/wp-ogp.php',									// WP-OGP
+			'open-graph-protocol-framework/open-graph-protocol-framework.php',			// Open Graph Protocol Framework
+			'all-in-one-seo-pack/all_in_one_seo_pack.php',						// All in One SEO Pack
+			'facebook-featured-image-and-open-graph-meta-tags/fb-featured-image.php',		// Facebook Featured Image & OG Meta Tags
+			'add-meta-tags/add-meta-tags.php',							// Add Meta Tags
+			'only-tweet-like-share-and-google-1/tweet-like-plusone.php',				// Tweet, Like, Google +1 and Share
+			'easy-facebook-share-thumbnails/esft.php',						// Easy Facebook Share Thumbnail
+			'2-click-socialmedia-buttons/2-click-socialmedia-buttons.php',				// 2 Click Social Media Buttons
+			'facebook-thumb-fixer/_facebook-thumb-fixer.php',					// Facebook Thumb Fixer
+			'zoltonorg-social-plugin/zosp.php',							// Zolton.org Social Plugin
+			'wp-caregiver/wp-caregiver.php',							// WP Caregiver
+			'facebook-revised-open-graph-meta-tag/index.php',					// Facebook Revised Open Graph Meta Tag
 		);
 
 		foreach ( $conflicting_plugins as $plugin ) {
@@ -1883,6 +1945,9 @@ p {
 					font-family: 'Jetpack' !important;
 					content: '\\e600';
 				}
+				#toplevel_page_jetpack .wp-menu-image {
+					background-repeat: no-repeat;
+				}
 				#menu-posts-feedback .wp-menu-image:before {
 					font-family: dashicons !important;
 					content: '\\f175';
@@ -2266,7 +2331,7 @@ p {
 				$this->error .= '  ' . sprintf( __( 'This module can only be altered by %s, the user who initiated the Jetpack connection on this site.' , 'jetpack' ), esc_html( $master_userdata->display_name ) );
 
 			} else {
-				$this->error = sprintf( __( 'Only the user who initiated the Jetpack connection on this site can toggle %s, but that user no longer exists. This should not happen.' ), $module_name );
+				$this->error = sprintf( __( 'Only the user who initiated the Jetpack connection on this site can toggle %s, but that user no longer exists. This should not happen.', 'jetpack' ), $module_name );
 			}
 			break;
 		case 'not_public' :
@@ -3243,6 +3308,24 @@ p {
 		exit;
 	}
 
+	function sync_reindex_trigger() {
+		if ( $this->current_user_is_connection_owner() && current_user_can( 'manage_options' ) ) {
+			echo json_encode( $this->sync->reindex_trigger() );
+		} else {
+			echo '{"status":"ERROR"}';
+		}
+		exit;
+	}
+
+	function sync_reindex_status(){
+		if ( $this->current_user_is_connection_owner() && current_user_can( 'manage_options' ) ) {
+			echo json_encode( $this->sync->reindex_status() );
+		} else {
+			echo '{"status":"ERROR"}';
+		}
+		exit;
+	}
+
 /* Client API */
 
 	/**
@@ -3729,7 +3812,9 @@ p {
 		if ( ! isset( $clients[$client_blog_id] ) ) {
 			Jetpack::load_xml_rpc_client();
 			$clients[$client_blog_id] = new Jetpack_IXR_ClientMulticall( array( 'user_id' => JETPACK_MASTER_USER, ) );
-			ignore_user_abort( true );
+			if ( function_exists( 'ignore_user_abort' ) ) {
+				ignore_user_abort( true );
+			}
 			add_action( 'shutdown', array( 'Jetpack', 'xmlrpc_async_call' ) );
 		}
 

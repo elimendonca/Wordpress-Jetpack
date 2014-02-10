@@ -319,7 +319,7 @@ class Grunion_Contact_Form_Plugin {
 
 		$response = akismet_http_post( $query_string, $akismet_api_host, '/1.1/comment-check', $akismet_api_port );
 		$result = false;
-		if ( 'true' == trim( $response[1] ) ) // 'true' is spam
+		if ( isset( $response[1] ) && 'true' == trim( $response[1] ) ) // 'true' is spam
 			$result = true;
 		return apply_filters( 'contact_form_is_spam_akismet', $result, $form );
 	}
@@ -450,7 +450,7 @@ class Grunion_Contact_Form_Plugin {
 		// Get the feedbacks' parents' post IDs
 		$feedbacks = get_posts( array(
 			'fields'           => 'id=>parent',
-			'posts_per_page'   => -1,
+			'posts_per_page'   => 100000,
 			'post_type'        => 'feedback',
 			'post_status'      => 'publish',
 			'suppress_filters' => false,
@@ -459,7 +459,7 @@ class Grunion_Contact_Form_Plugin {
 
 		$posts = get_posts( array(
 			'orderby'          => 'ID',
-			'posts_per_page'   => -1,
+			'posts_per_page'   => 1000,
 			'post_type'        => 'any',
 			'post__in'         => array_values( $parents ),
 			'suppress_filters' => false,
@@ -1362,12 +1362,13 @@ class Grunion_Contact_Form_Field extends Crunion_Contact_Form_Shortcode {
 	 */
 	function __construct( $attributes, $content = null, $form = null ) {
 		$attributes = shortcode_atts( array(
-			'label'    => null,
-			'type'     => 'text',
-			'required' => false,
-			'options'  => array(),
-			'id'       => null,
-			'default'  => null,
+			'label'       => null,
+			'type'        => 'text',
+			'required'    => false,
+			'options'     => array(),
+			'id'          => null,
+			'default'     => null,
+			'placeholder' => null,
 		), $attributes );
 
 		// special default for subject field
@@ -1484,10 +1485,12 @@ class Grunion_Contact_Form_Field extends Crunion_Contact_Form_Shortcode {
 
 		$r = '';
 
-		$field_id        = $this->get_attribute( 'id' );
-		$field_type      = $this->get_attribute( 'type' );
-		$field_label     = $this->get_attribute( 'label' );
-		$field_required  = $this->get_attribute( 'required' );
+		$field_id          = $this->get_attribute( 'id' );
+		$field_type        = $this->get_attribute( 'type' );
+		$field_label       = $this->get_attribute( 'label' );
+		$field_required    = $this->get_attribute( 'required' );
+		$placeholder       = $this->get_attribute( 'placeholder' );
+		$field_placeholder = ( ! empty( $placeholder ) ) ? "placeholder='" . esc_attr( $placeholder ) . "'" : '';
 
 		if ( isset( $_POST[$field_id] ) ) {
 			$this->value = stripslashes( (string) $_POST[$field_id] );
@@ -1517,7 +1520,7 @@ class Grunion_Contact_Form_Field extends Crunion_Contact_Form_Shortcode {
 		case 'email' :
 			$r .= "\n<div>\n";
 			$r .= "\t\t<label for='" . esc_attr( $field_id ) . "' class='grunion-field-label email" . ( $this->is_error() ? ' form-error' : '' ) . "'>" . esc_html( $field_label ) . ( $field_required ? '<span>' . __( "(required)", 'jetpack' ) . '</span>' : '' ) . "</label>\n";
-			$r .= "\t\t<input type='email' name='" . esc_attr( $field_id ) . "' id='" . esc_attr( $field_id ) . "' value='" . esc_attr( $field_value ) . "' class='email' />\n";
+			$r .= "\t\t<input type='email' name='" . esc_attr( $field_id ) . "' id='" . esc_attr( $field_id ) . "' value='" . esc_attr( $field_value ) . "' class='email' " . $field_placeholder . "/>\n";
 			$r .= "\t</div>\n";
 			break;
 		case 'textarea' :
@@ -1569,11 +1572,11 @@ class Grunion_Contact_Form_Field extends Crunion_Contact_Form_Shortcode {
 			// input fields like name, email, url that require special validation or handling at POST
 			$r .= "\n<div>\n";
 			$r .= "\t\t<label for='" . esc_attr( $field_id ) . "' class='grunion-field-label " . esc_attr( $field_type ) . ( $this->is_error() ? ' form-error' : '' ) . "'>" . esc_html( $field_label ) . ( $field_required ? '<span>' . __( "(required)", 'jetpack' ) . '</span>' : '' ) . "</label>\n";
-			$r .= "\t\t<input type='text' name='" . esc_attr( $field_id ) . "' id='" . esc_attr( $field_id ) . "' value='" . esc_attr( $field_value ) . "' class='" . esc_attr( $field_type ) . "'/>\n";
+			$r .= "\t\t<input type='text' name='" . esc_attr( $field_id ) . "' id='" . esc_attr( $field_id ) . "' value='" . esc_attr( $field_value ) . "' class='" . esc_attr( $field_type ) . "' " . $field_placeholder . "/>\n";
 			$r .= "\t</div>\n";
 		}
 
-		return apply_filters( 'grunion_contact_form_field_html', $r, $field_label );
+		return apply_filters( 'grunion_contact_form_field_html', $r, $field_label, ( in_the_loop() ? get_the_ID() : null ) );
 	}
 }
 

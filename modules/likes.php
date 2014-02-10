@@ -9,7 +9,7 @@
  * Module Tags: Social
  */
 class Jetpack_Likes {
-	var $version = '20131104';
+	var $version = '20140110';
 
 	public static function init() {
 		static $instance = NULL;
@@ -71,6 +71,7 @@ class Jetpack_Likes {
 		add_action( 'admin_bar_menu', array( $this, 'admin_bar_likes' ), 60 );
 
 		add_action( 'save_post', array( $this, 'meta_box_save' ) );
+		add_action( 'edit_attachment', array( $this, 'meta_box_save' ) );
 		add_action( 'sharing_global_options', array( $this, 'admin_settings_init' ), 20 );
 		add_action( 'sharing_admin_update',   array( $this, 'admin_settings_callback' ), 20 );
 	}
@@ -133,7 +134,7 @@ class Jetpack_Likes {
 
 		// Record sharing disable. Only needs to be done for WPCOM
 		if ( ! $this->in_jetpack ) {
-			if ( isset( $_POST['post_type'] ) && ( 'post' == $_POST['post_type'] || 'page' == $_POST['post_type'] ) ) {
+			if ( isset( $_POST['post_type'] ) && in_array( $_POST['post_type'], get_post_types( array( 'public' => true ) ) ) ) {
 				if ( isset( $_POST['wpl_sharing_status_hidden'] ) && !isset( $_POST['wpl_enable_post_sharing'] ) ) {
 					update_post_meta( $post_id, 'sharing_disabled', 1 );
 				} else {
@@ -516,7 +517,6 @@ class Jetpack_Likes {
 	* Load the CSS needed for the wp-admin area.
 	*/
 	function load_admin_css() {
-		include( ABSPATH . WPINC . '/version.php' );
 		?>
 		<style type="text/css">
 			.fixed .column-likes { width: 5em; padding-top: 8px; text-align: center !important; }
@@ -524,7 +524,7 @@ class Jetpack_Likes {
 			.fixed .column-likes .post-com-count { background-image: none; }
 			.fixed .column-likes .comment-count { background-color: #888; }
 			.fixed .column-likes .comment-count:hover { background-color: #D54E21; }
-		<?php if ( version_compare( $wp_version, '3.8-alpha', '>=' ) ) : ?>
+		<?php if ( version_compare( $GLOBALS['wp_version'], '3.8-alpha', '>=' ) ) : ?>
 			.fixed .column-likes .post-com-count::after { border: none !important; }
 			.fixed .column-likes .comment-count { background-color: #bbb; }
 			.fixed .column-likes .comment-count:hover { background-color: #2ea2cc; }
@@ -695,7 +695,7 @@ class Jetpack_Likes {
 		}
 
 		add_filter( 'wp_footer', array( $this, 'likes_master' ) );
-		
+
 		$src = sprintf( '%1$s://widgets.wp.com/likes/#blog_id=%2$d&amp;post_id=%3$d&amp;origin=%1$s://%4$s', $protocol, $blog_id, $post->ID, $domain );
 
 		$html = "<iframe class='admin-bar-likes-widget jetpack-likes-widget' scrolling='no' frameBorder='0' name='admin-bar-likes-widget' src='$src'></iframe>";
@@ -720,14 +720,14 @@ class Jetpack_Likes {
 		}
 
 		$locale = ( '' == get_locale() || 'en' == get_locale() ) ? '' : '&amp;lang=' . strtolower( substr( get_locale(), 0, 2 ) );
-        $src = sprintf( '%1$s://widgets.wp.com/likes/master.html?ver=%2$s#ver=%2$s%3$s&amp;mp6=%4$d', $protocol, $this->version, $locale, apply_filters( 'mp6_enabled', 0 ) );
+		$src = sprintf( '%1$s://widgets.wp.com/likes/master.html?ver=%2$s#ver=%2$s%3$s&amp;mp6=%4$d', $protocol, $this->version, $locale, apply_filters( 'mp6_enabled', 0 ) );
 
 		// Tidy up after ourselves.
 		if ( version_compare( $GLOBALS['wp_version'], '3.8-alpha', '>=' ) ) {
 			remove_filter( 'mp6_enabled', '__return_true', 97 );
 		}
 
-        $likersText = wp_kses( __( '<span>%d</span> bloggers like this:', 'jetpack' ), array( 'span' => array() ) );
+		$likersText = wp_kses( __( '<span>%d</span> bloggers like this:', 'jetpack' ), array( 'span' => array() ) );
 ?>
 		<iframe src='<?php echo $src; ?>' scrolling='no' id='likes-master' name='likes-master' style='display:none;'></iframe>
 		<div id='likes-other-gravatars'><div class="likes-text"><?php echo $likersText; ?></div><ul class="wpl-avatars sd-like-gravatars"></ul></div>
@@ -803,7 +803,8 @@ class Jetpack_Likes {
 							JetpackLikespostMessage( { event: 'adminBarEnabled' }, window.frames[ 'likes-master' ] );
 
 							stylesData.adminBarStyles = {
-								background: jQuery( '#wpadminbar .quicklinks li#wp-admin-bar-wpl-like > a' ).css( 'background' )
+								background: jQuery( '#wpadminbar .quicklinks li#wp-admin-bar-wpl-like > a' ).css( 'background' ),
+								isRtl: ( 'rtl' == jQuery( '#wpadminbar' ).css( 'direction' ) )
 							};
 						}
 
@@ -1065,7 +1066,12 @@ class Jetpack_Likes {
 		}
 
 		// Check that the post is a public, published post.
-		if ( 'publish' != $post->post_status ) {
+		if ( 'attachment' == $post->post_type ) {
+			$post_status = get_post_status( $post->post_parent );
+		} else {
+			$post_status = $post->post_status;
+		}
+		if ( 'publish' != $post_status ) {
 			$enabled = false;
 		}
 

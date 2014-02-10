@@ -390,7 +390,9 @@ class The_Neverending_Home_Page {
 		if ( empty( $query ) )
 			$query = self::wp_query();
 
-		switch ( $query->query_vars['orderby'] ) {
+		$orderby = isset( $query->query_vars['orderby'] ) ? $query->query_vars['orderby'] : '';
+
+		switch ( $orderby ) {
 			case 'modified':
 				return 'post_modified';
 			case 'date':
@@ -512,6 +514,7 @@ class The_Neverending_Home_Page {
 	 */
 	function action_wp_footer_settings() {
 		global $wp_rewrite;
+		global $currentday;
 
 		// Base JS settings
 		$js_settings = array(
@@ -523,6 +526,7 @@ class The_Neverending_Home_Page {
 			'footer'           => is_string( self::get_settings()->footer ) ? esc_js( self::get_settings()->footer ) : self::get_settings()->footer,
 			'text'             => esc_js( __( 'Older posts', 'jetpack' ) ),
 			'totop'            => esc_js( __( 'Scroll back to top', 'jetpack' ) ),
+			'currentday'       => $currentday,
 			'order'            => 'DESC',
 			'scripts'          => array(),
 			'styles'           => array(),
@@ -813,6 +817,12 @@ class The_Neverending_Home_Page {
 
 		$page = (int) $_GET['page'];
 
+		// Sanitize and set $previousday. Expected format: dd.mm.yy
+		if ( preg_match( '/^\d{2}\.\d{2}\.\d{2}$/', $_GET['currentday'] ) ) {
+			global $previousday;
+			$previousday = $_GET['currentday'];
+		}
+
 		$sticky = get_option( 'sticky_posts' );
 		$post__not_in = self::wp_query()->get( 'post__not_in' );
 		if ( ! empty( $post__not_in ) )
@@ -890,7 +900,9 @@ class The_Neverending_Home_Page {
 			ob_end_clean();
 
 			if ( 'success' == $results['type'] ) {
+				global $currentday;
 				$results['lastbatch'] = self::is_last_batch();
+				$results['currentday'] = $currentday;
 			}
 
 			// Loop through posts to capture sharing data for new posts loaded via Infinite Scroll
